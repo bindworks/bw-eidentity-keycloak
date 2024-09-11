@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -ex
+
+KEYCLOAK_NATS_EVENT_PUBLISHER_VERSION=1.0.14
+KEYCLOAK_ROLE_ATTRIBUTE_MAPPER_VERSION=1.0.5
+
+rm -rf keycloak-root
+mkdir -p keycloak-root/providers
+
+echo "downloading nats events publisher..." && \
+curl -L -o /tmp/artifacts.zip https://gitlab.com/bindworks/libs/keycloak-nats-event-publisher/-/jobs/artifacts/keycloak-nats-event-publisher-${KEYCLOAK_NATS_EVENT_PUBLISHER_VERSION}/download?job=build
+unzip -p /tmp/artifacts.zip target/keycloak-nats-event-publisher.tar.gz > /tmp/providers.tar.gz && \
+tar -C keycloak-root -xzf /tmp/providers.tar.gz
+rm -rf /tmp/artifacts.zip /tmp/providers.tar.gz
+
+echo "downloading role attributes mapper..." && \
+curl -L -o /tmp/artifacts.zip https://gitlab.com/bindworks/libs/keycloak-role-attribute-mapper/-/jobs/artifacts/keycloak-role-attribute-mapper-${KEYCLOAK_ROLE_ATTRIBUTE_MAPPER_VERSION}/download?job=build
+(cd keycloak-root && ln -s providers target && unzip /tmp/artifacts.zip target/keycloak-role-attribute-mapper\*.jar && rm target)
+
