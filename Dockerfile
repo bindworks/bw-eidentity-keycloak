@@ -1,8 +1,8 @@
-FROM bitnami/keycloak:25.0.2-debian-12-r2
+FROM bitnami/keycloak:26.2.5-debian-12-r0
 
 USER root
 
-ENV KEYCLOAK_DOCKER_REVISION=25.0.2-1
+ENV KEYCLOAK_DOCKER_REVISION=26.2.5-1
 
 RUN apt-get update && apt-get install -y \
   unzip \
