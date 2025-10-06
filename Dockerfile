@@ -1,4 +1,4 @@
-FROM bitnami/keycloak:26.3.3-debian-12-r0
+FROM bitnamilegacy/keycloak:26.3.3-debian-12-r0
 
 USER root
 
