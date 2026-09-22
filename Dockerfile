@@ -1,21 +1,34 @@
-FROM bitnamilegacy/keycloak:26.3.3-debian-12-r0
+FROM debian:bookworm-slim AS providers
 
-USER root
-
-ENV KEYCLOAK_DOCKER_REVISION=26.3.3-1
-
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ca-certificates \
+  curl \
   unzip \
   && rm -rf /var/lib/apt/lists/*
 
-COPY ./ /tmp/source/
+COPY build-keycloak-root /tmp/source/
 
-RUN cd /tmp/source && \
-    ls -la && \
-    ./build-keycloak-root && \
-    cp -R keycloak-root/* /opt/bitnami/keycloak && \
-    cd - && \
-    rm -rf /tmp/source
+RUN cd /tmp/source && ./build-keycloak-root
 
-USER keycloak
 
+FROM quay.io/keycloak/keycloak:26.3.3 AS builder
+
+ENV KC_DB=postgres \
+    KC_CACHE=ispn \
+    KC_CACHE_STACK=jdbc-ping \
+    KC_HEALTH_ENABLED=true \
+    KC_METRICS_ENABLED=true \
+    KC_FEATURES=persistent-user-sessions,token-exchange,organization,authorization
+
+COPY --from=providers /tmp/source/keycloak-root/ /opt/keycloak/
+
+RUN /opt/keycloak/bin/kc.sh build
+
+
+FROM quay.io/keycloak/keycloak:26.3.3
+
+ENV KEYCLOAK_DOCKER_REVISION=26.3.3-2
+
+COPY --from=builder /opt/keycloak/ /opt/keycloak/
+
+CMD ["start", "--optimized"]
