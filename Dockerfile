@@ -11,14 +11,14 @@ COPY build-keycloak-root /tmp/source/
 RUN cd /tmp/source && ./build-keycloak-root
 
 
-FROM quay.io/keycloak/keycloak:26.3.3 AS builder
+FROM quay.io/keycloak/keycloak:26.7.4 AS builder
 
 ENV KC_DB=postgres \
     KC_CACHE=ispn \
     KC_CACHE_STACK=jdbc-ping \
     KC_HEALTH_ENABLED=true \
     KC_METRICS_ENABLED=true \
-    KC_FEATURES=persistent-user-sessions,token-exchange,organization,authorization
+    KC_FEATURES=persistent-user-sessions,organization,authorization
 
 COPY --from=providers /tmp/source/keycloak-root/ /opt/keycloak/
 COPY themes/ /opt/keycloak/themes/
@@ -26,9 +26,9 @@ COPY themes/ /opt/keycloak/themes/
 RUN /opt/keycloak/bin/kc.sh build
 
 
-FROM quay.io/keycloak/keycloak:26.3.3
+FROM quay.io/keycloak/keycloak:26.7.4
 
-ENV KEYCLOAK_DOCKER_REVISION=26.3.3-5
+ENV KEYCLOAK_DOCKER_REVISION=26.7.4-1
 
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 
