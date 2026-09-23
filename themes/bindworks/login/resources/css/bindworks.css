@@ -1,0 +1,786 @@
+/* Bindworks login theme, on top of keycloak.v2 (PatternFly 5). Look of https://www.bindworks.eu */
+
+:root {
+    --bw-blue: #2559f6;
+    --bw-blue-dark: #1b47d4;
+    /* card colour of the original website contact form */
+    --bw-card: #346ef8;
+    /* same saturation/lightness as the card blue, hue shifted to red */
+    --bw-red: #f83444;
+    --bw-ink: #0d0d0d;
+    --bw-line: rgba(14, 19, 69, 0.12);
+    --bw-field-bg: rgba(255, 255, 255, 0.08);
+    --bw-field-bg-focus: rgba(255, 255, 255, 0.12);
+    --bw-field-border: rgba(255, 255, 255, 0.15);
+    --bw-field-radius: 8px;
+    --bw-placeholder: rgba(255, 255, 255, 0.55);
+    --bw-font: 'Manrope', sans-serif;
+    --bw-font-heading: 'Space Grotesk', sans-serif;
+
+    --pf-v5-global--FontFamily--text: var(--bw-font);
+    --pf-v5-global--FontFamily--heading: var(--bw-font-heading);
+    --pf-v5-global--FontFamily--redhatfont--text: var(--bw-font);
+    --pf-v5-global--FontFamily--redhatfont--heading: var(--bw-font-heading);
+}
+
+/* page */
+.login-pf body {
+    background: #fff;
+    color: var(--bw-ink);
+    font-family: var(--bw-font);
+}
+
+/* card centred vertically in the space below the 80px top bar */
+.pf-v5-c-login {
+    min-height: 100vh;
+    padding: 112px 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pf-v5-c-login__container {
+    grid-template-columns: minmax(0, 30rem);
+    width: 100%;
+    max-width: 30rem;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* top bar with the logo only */
+.pf-v5-c-login__header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 10;
+    height: 80px;
+    margin: 0;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-bottom: 1px solid var(--bw-line);
+}
+
+#kc-header-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 40px;
+    transform: translateY(-50%);
+    width: 130px;
+    height: 35px;
+    margin: 0;
+    padding: 0;
+    background: url('../img/bindworks-logo.svg') no-repeat left center / contain;
+    font-size: 0;
+    color: transparent !important;
+    overflow: hidden;
+}
+
+#kc-header-wrapper * {
+    display: none;
+}
+
+/* links added by js/header.js */
+.bw-logo-link {
+    position: absolute;
+    top: 50%;
+    left: 40px;
+    transform: translateY(-50%);
+    width: 130px;
+    height: 35px;
+}
+
+.bw-contact {
+    position: absolute;
+    top: 50%;
+    right: 40px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 48px;
+    padding: 0 20px;
+    border-radius: 16px;
+    background: var(--bw-blue);
+    color: #fff;
+    font-family: var(--bw-font);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.bw-contact:hover,
+.bw-contact:focus-visible {
+    background: var(--bw-blue-dark);
+    color: #fff;
+    text-decoration: none;
+}
+
+.bw-contact:focus-visible,
+.bw-logo-link:focus-visible {
+    outline: 2px solid var(--bw-blue);
+    outline-offset: 3px;
+}
+
+/* the blue card */
+.pf-v5-c-login__main {
+    background: var(--bw-card);
+    color: #fff;
+    border-radius: 24px;
+    padding: 48px;
+    box-shadow: 0 24px 60px -24px rgba(52, 110, 248, 0.55);
+
+    --pf-v5-global--Color--100: #fff;
+    --pf-v5-global--Color--200: rgba(255, 255, 255, 0.8);
+    --pf-v5-global--link--Color: #fff;
+    --pf-v5-global--link--Color--hover: #fff;
+    --pf-v5-c-form__label--Color: #fff;
+    --pf-v5-c-form__label-text--FontWeight: 600;
+}
+
+.pf-v5-c-login__main-header,
+.pf-v5-c-login__main-body,
+.pf-v5-c-login__main-footer {
+    padding: 0;
+}
+
+.pf-v5-c-login__main-header {
+    border-top: 0;
+    margin-bottom: 32px;
+}
+
+.pf-v5-c-login__main-header .pf-v5-c-title {
+    font-family: var(--bw-font-heading);
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    color: #fff;
+}
+
+.pf-v5-c-login__main-body p,
+.pf-v5-c-login__main-body .instruction,
+#kc-logout-confirm > p {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.pf-v5-c-login__main a:not(.pf-v5-c-button):not(.bw-lang-link) {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.pf-v5-c-form__label,
+.pf-v5-c-form__label-text,
+.pf-v5-c-check__label,
+.pf-v5-c-login__main-footer-band,
+.pf-v5-c-login__main-footer-band-item,
+.pf-v5-c-helper-text__item-text,
+#kc-info-wrapper,
+.pf-v5-c-login__main p {
+    color: #fff;
+}
+
+/* inputs */
+.pf-v5-c-login__main .pf-v5-c-form-control {
+    --pf-v5-c-form-control--BackgroundColor: var(--bw-field-bg);
+    --pf-v5-c-form-control--Color: #fff;
+    --pf-v5-c-form-control--before--BorderColor: var(--bw-field-border);
+    --pf-v5-c-form-control--before--BorderWidth: 1px;
+    --pf-v5-c-form-control--after--BorderColor: transparent;
+    --pf-v5-c-form-control--after--BorderWidth: 0;
+    --pf-v5-c-form-control--hover--after--BorderColor: rgba(255, 255, 255, 0.5);
+    --pf-v5-c-form-control--hover--after--BorderWidth: 1px;
+    --pf-v5-c-form-control--focus--after--BorderColor: #fff;
+    --pf-v5-c-form-control--focus--after--BorderWidth: 1px;
+    --pf-v5-c-form-control--m-readonly--BackgroundColor: rgba(255, 255, 255, 0.06);
+    --pf-v5-c-form-control--m-readonly--hover--after--BorderColor: var(--bw-field-border);
+    --pf-v5-c-form-control--m-readonly--focus--after--BorderColor: var(--bw-field-border);
+    --pf-v5-c-form-control__toggle-icon--Color: #fff;
+    border-radius: var(--bw-field-radius);
+    background-color: var(--bw-field-bg);
+    color: #fff;
+    min-height: 50px;
+}
+
+/* one uniform 1px border like the website form (PF draws a second, thicker bottom line in ::after) */
+.pf-v5-c-login__main .pf-v5-c-form-control::before {
+    border: 1px solid var(--bw-field-border);
+    border-radius: var(--bw-field-radius);
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control::after {
+    display: none;
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control:hover::before {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control > input,
+.pf-v5-c-login__main .pf-v5-c-form-control > select,
+.pf-v5-c-login__main .pf-v5-c-form-control > textarea,
+.pf-v5-c-login__main input.pf-v5-c-form-control,
+.pf-v5-c-login__main input:not([type=checkbox]):not([type=radio]):not([type=submit]):not([type=hidden]) {
+    color: #fff;
+    background: transparent;
+    font-family: var(--bw-font);
+    font-size: 16px;
+    padding-inline: 16px;
+    min-height: 48px;
+}
+
+.pf-v5-c-login__main .pf-v5-c-form {
+    gap: 20px;
+}
+
+.pf-v5-c-login__main .pf-v5-c-form__group:not(:has(input, select, textarea, button, a, label, span, p)) {
+    display: none;
+}
+
+.pf-v5-c-login__main input::placeholder {
+    color: var(--bw-placeholder);
+}
+
+.pf-v5-c-login__main input:-webkit-autofill,
+.pf-v5-c-login__main input:-webkit-autofill:hover,
+.pf-v5-c-login__main input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #fff;
+    caret-color: #fff;
+    transition: background-color 9999s ease-out 0s;
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control:focus-within {
+    background-color: var(--bw-field-bg-focus);
+}
+
+.pf-v5-c-login__main input:focus,
+.pf-v5-c-login__main input:focus-visible,
+.pf-v5-c-login__main select:focus {
+    outline: none;
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control:focus-within::before {
+    border-color: #fff;
+}
+
+.pf-v5-c-login__main .pf-v5-c-button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+/* inputs without the PF wrapper (plugin forms, e.g. the Email OTP code) */
+.pf-v5-c-login__main .pf-v5-c-form__group > input:not([type=hidden]):not([type=submit]),
+.pf-v5-c-login__main form > div > input#emailCode {
+    width: 100%;
+    min-height: 50px;
+    border: 1px solid var(--bw-field-border);
+    border-radius: var(--bw-field-radius);
+    background: var(--bw-field-bg);
+    outline: none;
+}
+
+.pf-v5-c-login__main .pf-v5-c-form__group > input:focus,
+.pf-v5-c-login__main form > div > input#emailCode:focus {
+    border-color: #fff;
+    background: var(--bw-field-bg-focus);
+}
+
+.pf-v5-c-login__main label[for=emailCode] {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+/* password eye / restart login buttons next to inputs */
+.pf-v5-c-login__main .pf-v5-c-button.pf-m-control {
+    --pf-v5-c-button--m-control--BackgroundColor: var(--bw-field-bg);
+    --pf-v5-c-button--m-control--Color: #fff;
+    --pf-v5-c-button--m-control--hover--Color: #fff;
+    --pf-v5-c-button--m-control--after--BorderColor: var(--bw-field-border);
+    --pf-v5-c-button--m-control--hover--after--BorderBottomColor: #fff;
+    --pf-v5-c-button--m-control--after--BorderWidth: 1px;
+    --pf-v5-c-button--m-control--hover--after--BorderWidth: 1px;
+    --pf-v5-c-button--m-control--focus--after--BorderWidth: 1px;
+    --pf-v5-c-button--m-control--active--after--BorderWidth: 1px;
+    border-radius: 0 var(--bw-field-radius) var(--bw-field-radius) 0;
+    color: #fff;
+    min-height: 50px;
+    min-width: 50px;
+}
+
+.pf-v5-c-login__main .pf-v5-c-button.pf-m-control::after {
+    border: 1px solid var(--bw-field-border);
+    border-radius: 0 var(--bw-field-radius) var(--bw-field-radius) 0;
+}
+
+.pf-v5-c-login__main .pf-v5-c-button.pf-m-control:hover::after {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.pf-v5-c-input-group > .pf-v5-c-input-group__item:not(:last-child) .pf-v5-c-form-control,
+.pf-v5-c-input-group > .pf-v5-c-input-group__item:not(:last-child) .pf-v5-c-form-control::before,
+.pf-v5-c-input-group > .pf-v5-c-input-group__item:not(:last-child) .pf-v5-c-form-control::after {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+}
+
+.pf-v5-c-login__main .pf-v5-c-input-group > .pf-v5-c-input-group__item:not(:last-child) .pf-v5-c-form-control::before,
+.pf-v5-c-login__main .pf-v5-c-input-group > .pf-v5-c-input-group__item:not(:last-child) .pf-v5-c-form-control::after {
+    border-inline-end-width: 0;
+}
+
+.pf-v5-c-login__main .pf-v5-c-input-group {
+    gap: 0;
+}
+
+.pf-v5-c-input-group > .pf-v5-c-input-group__item:last-child .pf-v5-c-button.pf-m-control,
+.pf-v5-c-input-group > .pf-v5-c-input-group__item:last-child .pf-v5-c-button.pf-m-control::after {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+}
+
+/* buttons: white pill like the website, secondary = outlined */
+.pf-v5-c-login__main .pf-v5-c-button,
+.pf-v5-c-login__main input[type=submit] {
+    font-family: var(--bw-font);
+}
+
+.pf-v5-c-login__main .pf-v5-c-button.pf-m-primary,
+.pf-v5-c-login__main input[type=submit].pf-v5-c-button.pf-m-primary {
+    --pf-v5-c-button--BorderRadius: 100px;
+    --pf-v5-c-button--m-primary--BackgroundColor: #fff;
+    --pf-v5-c-button--m-primary--Color: var(--bw-blue);
+    --pf-v5-c-button--m-primary--hover--BackgroundColor: #eef2ff;
+    --pf-v5-c-button--m-primary--hover--Color: var(--bw-blue-dark);
+    --pf-v5-c-button--m-primary--focus--BackgroundColor: #eef2ff;
+    --pf-v5-c-button--m-primary--focus--Color: var(--bw-blue-dark);
+    --pf-v5-c-button--m-primary--active--BackgroundColor: #e0e8ff;
+    --pf-v5-c-button--m-primary--active--Color: var(--bw-blue-dark);
+    border-radius: 100px;
+    background-color: #fff;
+    color: var(--bw-blue);
+    border: 0;
+    min-height: 52px;
+    padding: 14px 32px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.pf-v5-c-login__main .pf-v5-c-button.pf-m-secondary,
+.pf-v5-c-login__main .pf-v5-c-button.pf-m-link,
+.pf-v5-c-login__main input[type=submit][name=resend].pf-v5-c-button.pf-m-primary,
+.pf-v5-c-login__main input[type=submit][name=cancel].pf-v5-c-button.pf-m-primary {
+    --pf-v5-c-button--BorderRadius: 100px;
+    --pf-v5-c-button--m-secondary--BackgroundColor: transparent;
+    --pf-v5-c-button--m-secondary--Color: #fff;
+    --pf-v5-c-button--m-secondary--after--BorderColor: rgba(255, 255, 255, 0.6);
+    --pf-v5-c-button--m-secondary--hover--BackgroundColor: rgba(255, 255, 255, 0.1);
+    --pf-v5-c-button--m-secondary--hover--Color: #fff;
+    --pf-v5-c-button--m-secondary--hover--after--BorderColor: #fff;
+    --pf-v5-c-button--m-secondary--focus--Color: #fff;
+    --pf-v5-c-button--m-secondary--active--Color: #fff;
+    --pf-v5-c-button--m-link--Color: #fff;
+    --pf-v5-c-button--m-link--hover--Color: #fff;
+    border-radius: 100px;
+    background-color: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    min-height: 48px;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: none;
+}
+
+.pf-v5-c-login__main .pf-v5-c-button.pf-m-secondary:hover,
+.pf-v5-c-login__main input[type=submit][name=resend].pf-v5-c-button.pf-m-primary:hover,
+.pf-v5-c-login__main input[type=submit][name=cancel].pf-v5-c-button.pf-m-primary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+}
+
+.pf-v5-c-login__main .pf-v5-c-button:not(.pf-m-control)::after {
+    border-radius: 100px;
+}
+
+/* Email OTP form: the plugin puts three primary buttons in a row */
+.pf-v5-c-login__main #kc-u2f-login-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.pf-v5-c-login__main #kc-u2f-login-form > div {
+    flex: 1 1 100%;
+    margin-bottom: 12px;
+}
+
+.pf-v5-c-login__main #kc-u2f-login-form > input[type=submit] {
+    flex: 1 1 100%;
+    width: 100%;
+}
+
+.pf-v5-c-login__main #kc-u2f-login-form > input[type=submit][name=resend],
+.pf-v5-c-login__main #kc-u2f-login-form > input[type=submit][name=cancel] {
+    flex: 1 1 calc(50% - 6px);
+}
+
+.pf-v5-c-login__main .pf-v5-c-form__actions {
+    margin-top: 4px;
+    padding-top: 0;
+}
+
+/* social providers (Google) */
+#kc-social-providers {
+    margin-top: 0;
+}
+
+/* "Or sign in with" between the form and the Google button */
+.pf-v5-c-login__main-footer-band:has(+ #kc-social-providers) .pf-v5-c-login__main-footer-band-item,
+.pf-v5-c-login__main-footer-band-item.pf-v5-u-font-size-sm {
+    display: block;
+    padding: 28px 0 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+#kc-social-providers h2,
+.kc-social-section-text,
+#kc-social-providers .kc-social-section-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-family: var(--bw-font);
+    font-size: 14px;
+}
+
+#kc-social-providers hr {
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+#kc-social-providers .pf-v5-c-button.pf-m-secondary {
+    --pf-v5-c-button--m-secondary--BackgroundColor: #fff;
+    --pf-v5-c-button--m-secondary--Color: var(--bw-ink);
+    --pf-v5-c-button--m-secondary--hover--BackgroundColor: #eef2ff;
+    --pf-v5-c-button--m-secondary--hover--Color: var(--bw-ink);
+    --pf-v5-c-button--m-secondary--after--BorderColor: transparent;
+    background-color: #fff;
+    color: var(--bw-ink);
+    border: 0;
+    justify-content: center !important;
+    gap: 10px;
+    min-height: 52px;
+    padding: 14px 32px;
+}
+
+/* text centred on the whole button like SIGN IN; the logo sits on the left edge */
+#kc-social-providers .pf-v5-c-button.pf-m-secondary {
+    position: relative;
+}
+
+#kc-social-providers .pf-v5-c-button.pf-m-secondary > svg {
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#kc-social-providers .pf-v5-c-button.pf-m-secondary > span {
+    margin: 0 auto;
+}
+
+/* same font as the primary button, black text, not uppercased */
+#kc-social-providers .pf-v5-c-button.pf-m-secondary,
+#kc-social-providers .pf-v5-c-button.pf-m-secondary .kc-social-provider-name,
+#kc-social-providers .pf-v5-c-button.pf-m-secondary span {
+    color: var(--bw-ink);
+    margin: 0;
+    font-family: var(--bw-font);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+/* alerts (errors, info) inside the blue card */
+.pf-v5-c-login__main .pf-v5-c-alert {
+    --pf-v5-c-alert--BackgroundColor: #fff;
+    --pf-v5-c-alert--BorderTopWidth: 0;
+    --pf-v5-c-alert--BoxShadow: none;
+    background: #fff;
+    border-radius: var(--bw-field-radius);
+    border: 0;
+    box-shadow: none;
+    padding: 12px 16px;
+}
+
+.pf-v5-c-login__main .pf-v5-c-alert .pf-v5-c-alert__title,
+.pf-v5-c-login__main .pf-v5-c-alert .kc-feedback-text {
+    color: var(--bw-ink);
+    font-weight: 600;
+}
+
+.pf-v5-c-login__main .pf-v5-c-alert.pf-m-danger {
+    --pf-v5-c-alert--BackgroundColor: var(--bw-red);
+    background: var(--bw-red);
+}
+
+.pf-v5-c-login__main .pf-v5-c-alert.pf-m-danger .pf-v5-c-alert__title,
+.pf-v5-c-login__main .pf-v5-c-alert.pf-m-danger .kc-feedback-text,
+.pf-v5-c-login__main .pf-v5-c-alert.pf-m-danger .pf-v5-c-alert__icon {
+    color: #fff;
+}
+.pf-v5-c-login__main .pf-v5-c-alert.pf-m-warning .pf-v5-c-alert__icon { color: #b98412; }
+.pf-v5-c-login__main .pf-v5-c-alert.pf-m-success .pf-v5-c-alert__icon { color: #1e7a3c; }
+.pf-v5-c-login__main .pf-v5-c-alert.pf-m-info .pf-v5-c-alert__icon { color: var(--bw-blue); }
+
+/* error page (e.g. "Deny access" message) */
+#kc-error-message .instruction {
+    padding: 12px 16px;
+    border-radius: var(--bw-field-radius);
+    background: var(--bw-red);
+    color: #fff;
+    font-weight: 600;
+}
+
+/* field-level error text (e.g. invalid password) */
+.pf-v5-c-login__main .pf-v5-c-helper-text__item-text.pf-m-error,
+.pf-v5-c-login__main span.kc-feedback-text.pf-m-error {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    background: var(--bw-red);
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control.pf-m-error {
+    --pf-v5-c-form-control--before--BorderColor: var(--bw-red);
+    --pf-v5-c-form-control--after--BorderColor: var(--bw-red);
+    --pf-v5-c-form-control__icon--m-status--Color: var(--bw-red);
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control.pf-m-error::before,
+.pf-v5-c-login__main .pf-v5-c-form-control.pf-m-error:focus-within::before {
+    border-color: var(--bw-red);
+    box-shadow: 0 0 0 1px var(--bw-red);
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control.pf-m-error .pf-v5-c-form-control__icon,
+.pf-v5-c-login__main .pf-v5-c-form-control__icon.pf-m-status {
+    color: #fff;
+    font-size: 20px;
+    padding-inline-end: 6px;
+}
+
+/* title left, switcher flush right and on the title's first line */
+.pf-v5-c-login__main-header:has(.bw-lang) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 16px;
+    align-items: start;
+}
+
+.pf-v5-c-login__main-header .bw-lang {
+    justify-self: end;
+    margin: 4px 0 0;
+    padding: 0;
+}
+
+/* two languages: a link to the other language (header.js) */
+.pf-v5-c-login__main .bw-lang-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    /* optically equal space around globe and text (the text carries trailing letter-spacing) */
+    padding: 0 10.5px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 100px;
+    color: #fff;
+    font-family: var(--bw-font);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: background-color 0.2s, border-color 0.2s;
+    /* nudge the caps down; the globe is moved back up so it stays centred */
+    padding-top: 1px;
+}
+
+.pf-v5-c-login__main .bw-lang-link::before {
+    margin-top: -1px;
+    content: "";
+    width: 13px;
+    height: 13px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.8'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+
+.pf-v5-c-login__main .bw-lang-link:hover,
+.pf-v5-c-login__main .bw-lang-link:focus-visible {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+    color: #fff;
+    text-decoration: none;
+}
+
+/* language switcher: globe pill like on the website */
+.bw-lang .pf-v5-c-form-control {
+    --pf-v5-c-form-control--before--BorderColor: transparent;
+    --pf-v5-c-form-control--after--BorderColor: transparent;
+    --pf-v5-c-form-control--hover--after--BorderColor: transparent;
+    --pf-v5-c-form-control--focus--after--BorderColor: transparent;
+    position: relative;
+    min-height: 36px;
+    height: 36px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 100px;
+    background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.8'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z'/%3E%3C/svg%3E") no-repeat 12px center / 16px 16px;
+    box-shadow: none;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.bw-lang .pf-v5-c-form-control:hover,
+.bw-lang .pf-v5-c-form-control:focus-within {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+    box-shadow: none;
+}
+
+.bw-lang .pf-v5-c-form-control::before,
+.bw-lang .pf-v5-c-form-control::after {
+    display: none;
+}
+
+.bw-lang select {
+    min-height: 34px !important;
+    height: 34px;
+    padding: 0 14px 0 34px !important;
+    color: #fff;
+    font-family: var(--bw-font);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    appearance: none;
+}
+
+.bw-lang select option {
+    color: var(--bw-ink);
+    background: #fff;
+}
+
+.pf-v5-c-login__main .bw-lang .pf-v5-c-form-control__utilities {
+    display: none;
+}
+
+.pf-v5-c-login__main .bw-lang .pf-v5-c-form-control {
+    width: 62px;
+    height: 30px;
+    min-height: 30px;
+    grid-template-columns: 100%;
+    background-position: 10px center;
+    background-size: 13px 13px;
+}
+
+.pf-v5-c-login__main .bw-lang select {
+    width: 100%;
+    height: 28px;
+    min-height: 28px !important;
+    padding: 0 8px 0 28px !important;
+    font-size: 12px;
+}
+
+/* status icon (!) vertically centred like the eye / restart buttons */
+.pf-v5-c-login__main .pf-v5-c-form-control__utilities {
+    align-self: center;
+    display: flex;
+    align-items: center;
+    padding-block: 0;
+    margin: 0;
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control__icon.pf-m-status {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    padding-block: 0;
+    height: 20px;
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control__icon.pf-m-status .fas,
+.pf-v5-c-login__main .pf-v5-c-form-control__icon.pf-m-status svg {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+/* tiles / data lists (TOTP device choice, "try another way") */
+.pf-v5-c-login__main .pf-v5-c-tile,
+.pf-v5-c-login__main .pf-v5-c-data-list,
+.pf-v5-c-login__main .pf-v5-c-data-list__item {
+    --pf-v5-c-data-list__item--BackgroundColor: var(--bw-field-bg);
+    --pf-v5-c-data-list--BackgroundColor: transparent;
+    --pf-v5-c-tile--BackgroundColor: var(--bw-field-bg);
+    background-color: var(--bw-field-bg);
+    color: #fff;
+    border-radius: var(--bw-field-radius);
+}
+
+.pf-v5-c-login__main .select-auth-box-headline,
+.pf-v5-c-login__main .select-auth-box-desc,
+.pf-v5-c-login__main .pf-v5-c-tile__title {
+    color: #fff;
+}
+
+/* footer below the card (language / info band) */
+.pf-v5-c-login__main-footer-band,
+.pf-v5-c-login__main-footer-band:first-child {
+    border-top: 0;
+    background: transparent;
+    margin-block-start: 0;
+    padding-block: 0;
+}
+
+.pf-v5-c-login__main-footer-band-item:not(:empty) {
+    padding-top: 16px;
+}
+
+/* phones */
+@media (max-width: 600px) {
+    .pf-v5-c-login__header {
+        height: 64px;
+        padding: 0 20px;
+    }
+
+    #kc-header-wrapper,
+    .bw-logo-link {
+        left: 20px;
+    }
+
+    .bw-contact {
+        right: 20px;
+        height: 40px;
+        padding: 0 14px;
+        border-radius: var(--bw-field-radius);
+    }
+
+    .pf-v5-c-login {
+        padding-top: 88px;
+        padding-bottom: 24px;
+    }
+
+    .pf-v5-c-login__main {
+        padding: 32px 24px;
+        border-radius: 20px;
+    }
+
+    .pf-v5-c-login__main-header .pf-v5-c-title {
+        font-size: 26px;
+    }
+}

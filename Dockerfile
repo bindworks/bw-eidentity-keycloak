@@ -21,13 +21,14 @@ ENV KC_DB=postgres \
     KC_FEATURES=persistent-user-sessions,token-exchange,organization,authorization
 
 COPY --from=providers /tmp/source/keycloak-root/ /opt/keycloak/
+COPY themes/ /opt/keycloak/themes/
 
 RUN /opt/keycloak/bin/kc.sh build
 
 
 FROM quay.io/keycloak/keycloak:26.3.3
 
-ENV KEYCLOAK_DOCKER_REVISION=26.3.3-4
+ENV KEYCLOAK_DOCKER_REVISION=26.3.3-5
 
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 
