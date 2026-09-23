@@ -32,15 +32,15 @@ which runs after a successful login and **denies access** when *all* of these ho
 - the user does **not** have the role `bindworks-user`.
 
 So users without `bindworks-user` can only use applications that carry one of those two (empty, marker-only)
-client scopes.
+client scopes. Today that is only **`dumplog-web`**; the SAML variant is not assigned to any client.
+To open another application to outsiders, add `non-bindworks-users-allowed-application-oidc` (or `-saml`) to
+that client as a default scope.
 
 **Logins through an identity provider button do not reach this check**: after the redirect back, Keycloak runs
 only the provider's *first login flow* and *post login flow*, not the rest of the browser flow. The top-level
 flow **`post login - non-Bindworks check`** is a copy of the check (own config aliases, `… - postlogin`); set it as
 *Post login flow* on every provider whose users do not get `bindworks-user`. Google does not need it (all its
-users are `bindworks-user`). Today that is only **`dumplog-web`**; the SAML variant is not assigned to any client.
-To open another application to outsiders, add `non-bindworks-users-allowed-application-oidc` (or `-saml`) to
-that client as a default scope.
+users are `bindworks-user`).
 
 ## How people sign in (browser flow `browser for Bindworks`)
 
