@@ -17,6 +17,11 @@ differs from a freshly created Keycloak realm. State as of 2026-09-23, Keycloak 
 Leaving the company: the person can no longer sign in with Google (the domain check fails), but the Keycloak
 user and its `/Companies/Bindworks` membership stay. Disable or delete the user to fully offboard.
 
+- **Partner companies sign in through their own identity provider** and get the realm role **`idp-only-user`**
+  (granted by their company group, today `/Companies/Iresoft`). Such users may sign in *only* through the
+  provider: the browser flow refuses them both password and Email OTP. Removing a person in the partner's
+  IdP is therefore enough to cut them off.
+
 ## Who may use which application
 
 The browser flow **`browser for Bindworks`** ends with the sub-flow **non-Bindworks Application Role Check**,
@@ -27,7 +32,13 @@ which runs after a successful login and **denies access** when *all* of these ho
 - the user does **not** have the role `bindworks-user`.
 
 So users without `bindworks-user` can only use applications that carry one of those two (empty, marker-only)
-client scopes. Today that is only **`dumplog-web`**; the SAML variant is not assigned to any client.
+client scopes.
+
+**Logins through an identity provider button do not reach this check**: after the redirect back, Keycloak runs
+only the provider's *first login flow* and *post login flow*, not the rest of the browser flow. The top-level
+flow **`post login - non-Bindworks check`** is a copy of the check (own config aliases, `… - postlogin`); set it as
+*Post login flow* on every provider whose users do not get `bindworks-user`. Google does not need it (all its
+users are `bindworks-user`). Today that is only **`dumplog-web`**; the SAML variant is not assigned to any client.
 To open another application to outsiders, add `non-bindworks-users-allowed-application-oidc` (or `-saml`) to
 that client as a default scope.
 
@@ -38,15 +49,15 @@ Cookie / Identity Provider Redirector
 browser login for kimai
 ├─ Username Form                      username first (Google button on the same page)
 ├─ Authenticate
-│  ├─ via Password      [CONDITIONAL] user has a password          -> password
-│  ├─ via Email OTP     [CONDITIONAL] no password and NOT bindworks-user -> code by e-mail
-│  └─ deny otherwise    [CONDITIONAL] neither ran                  -> "Přihlaš se pomocí Google."
+│  ├─ via Password      [CONDITIONAL] has a password and NOT idp-only-user                  -> password
+│  ├─ via Email OTP     [CONDITIONAL] password not used, NOT bindworks-user, NOT idp-only-user -> code by e-mail
+│  └─ deny otherwise    [CONDITIONAL] neither ran  -> "Přihlašte se pomocí některého vnějšího poskytovatele."
 └─ TOTP                 [CONDITIONAL] user has TOTP configured     -> one-time code
 non-Bindworks Application Role Check (see above)
 ```
 
-- Staff without a password who type their username are sent to Google; the deny guard is what stops them
-  from being let in with a username only.
+- Staff without a password and `idp-only-user` users who type their username end up in the deny guard,
+  which is what stops them from being let in with a username only.
 - **Email OTP** is our fork `keycloak-2fa-email-authenticator` (execution config: 6 digits, 3 attempts,
   300 s). Wrong codes count towards brute-force protection. The e-mail uses the email theme
   `email-code-theme` and the texts below.
@@ -61,6 +72,7 @@ Access inside the applications is managed with groups; the groups grant client r
 | Group | Grants | Used by |
 |---|---|---|
 | `/Companies/Bindworks` | realm role `bindworks-user` | the access check above |
+| `/Companies/Iresoft` | realm role `idp-only-user` | no password / Email OTP (see the flow above) |
 | `/Project Developers/*-devs` (and `admin-devs`) | `dumplog-web` roles `*-expander` | dumplog-web (which projects a developer can see) |
 | `/Kimai/Kimai_SuperAdmins`, `_Admins`, `_Teamleads` | `kimai` roles `Kimai-Role-*` | Kimai (SAML role list) |
 | `/oo/*/admins` | – (membership only) | presumably OpenObserve organisations, read from the `groups` claim |
