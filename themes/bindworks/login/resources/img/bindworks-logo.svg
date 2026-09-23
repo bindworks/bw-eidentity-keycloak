@@ -1,52 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 164 44" width="164" height="44" role="img" aria-label="Bindworks">
   <title>Bindworks</title>
-  <style>
-    /* Letters rise into place, the blue W rides in from the left. Self-contained, so it
-       works wherever the logo is used, an img element included. Delete this style
-       block for a completely static logo. */
-    .letter {
-      opacity: 0;
-      transform: translateY(6px) scale(0.985);
-      transform-origin: 50% 75%;
-      animation: bw-logo-rise 0.7s var(--delay, 0s) cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-    }
-    .letter:nth-of-type(1) { --delay: 300ms; }
-    .letter:nth-of-type(2) { --delay: 380ms; }
-    .letter:nth-of-type(3) { --delay: 460ms; }
-    .letter:nth-of-type(4) { --delay: 540ms; }
-    .letter:nth-of-type(5) { --delay: 620ms; }
-    .letter:nth-of-type(6) { --delay: 700ms; }
-    .letter:nth-of-type(7) { --delay: 840ms; }
-    .letter:nth-of-type(8) { --delay: 920ms; }
-    .letter:nth-of-type(9) { --delay: 1000ms; }
-    .letter:nth-of-type(10) { --delay: 1080ms; }
-
-    .letter-w {
-      opacity: 1;
-      transform: translateX(-70px);
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: bw-logo-ride-in 1.2s 0.15s cubic-bezier(0.22, 0.9, 0.22, 1) forwards;
-    }
-
-    @keyframes bw-logo-rise {
-      from { opacity: 0; transform: translateY(6px) scale(0.985); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    @keyframes bw-logo-ride-in {
-      from { transform: translateX(-70px); }
-      to   { transform: translateX(0); }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .letter,
-      .letter-w {
-        animation: none;
-        opacity: 1;
-        transform: none;
-      }
-    }
-  </style>
     <path class="letter" fill="#1D1D1B" d="M14.753,27.703 C14.073,28.102 13.332,28.296 12.486,28.296 C11.639,28.296 10.898,28.102 10.219,27.703 C9.54729357,27.3128652 8.99690793,26.7441334 8.629,26.06 C8.241,25.357 8.044,24.556 8.044,23.679 C8.044,22.803 8.24,22.008 8.627,21.314 C8.99873635,20.6351306 9.54932449,20.0710545 10.219,19.683 C10.899,19.283 11.639,19.089 12.486,19.089 C13.331,19.089 14.073,19.284 14.753,19.683 C15.4260276,20.0742464 15.9814292,20.6393193 16.361,21.319 C16.756,22.012 16.956,22.806 16.956,23.679 C16.956,24.553 16.756,25.352 16.36,26.055 C15.9840494,26.7401628 15.428476,27.3099108 14.753,27.703 L14.753,27.703 Z M17.115,16.474 C15.905,15.752 14.541,15.386 13.057,15.386 C11.8983262,15.3781077 10.7521486,15.6256438 9.7,16.111 C9.15077039,16.3659808 8.63353089,16.68485 8.159,17.061 L8.159,11.02 C8.159,10.431 7.963,9.942 7.576,9.566 C7.19,9.19 6.686,9 6.079,9 C5.495,9 5,9.188 4.604,9.558 C4.203,9.934 4,10.425 4,11.018 L4,23.678 C4,25.223 4.379,26.646 5.126,27.908 C5.86212652,29.1594324 6.91698647,30.1932434 8.183,30.904 C9.463,31.631 10.912,32 12.486,32 C14.057,32 15.514,31.632 16.813,30.907 C18.0918296,30.2037586 19.1554222,29.1660904 19.89,27.905 C20.626,26.643 21,25.221 21,23.679 C21,22.143 20.654,20.727 19.97,19.469 C19.3077641,18.2300745 18.3208286,17.1947428 17.115,16.474 Z" />
     <path class="letter" fill="#1D1D1B" d="M26,15 C25.438,15 24.96,15.195 24.58,15.579 C24.196,15.969 24,16.478 24,17.093 L24,29.907 C24,30.499 24.193,31.001 24.573,31.4 C24.954,31.798 25.434,32 26,32 C26.588,32 27.075,31.795 27.448,31.392 C27.814,30.994 28,30.494 28,29.907 L28,17.093 C28,16.483 27.812,15.975 27.44,15.585 C27.068,15.197 26.583,15 26,15" />
     <path class="letter" fill="#1D1D1B" d="M26.5,9 C25.82,9 25.226,9.248 24.737,9.737 C24.2594005,10.1983504 23.9928385,10.8360014 24,11.5 C24,12.18 24.248,12.774 24.737,13.263 C25.227,13.753 25.819,14 26.5,14 C27.181,14 27.774,13.752 28.263,13.263 C28.753,12.774 29,12.181 29,11.5 C29,10.82 28.752,10.226 28.263,9.737 C27.8016496,9.25940055 27.1639986,8.99283854 26.5,9" />

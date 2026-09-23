@@ -39,10 +39,11 @@
     justify-content: center;
 }
 
+/* 34rem like the website contact form; fits "Přihlášení do Bindworks" on one line */
 .pf-v5-c-login__container {
-    grid-template-columns: minmax(0, 30rem);
+    grid-template-columns: minmax(0, 34rem);
     width: 100%;
-    max-width: 30rem;
+    max-width: 34rem;
     margin: 0 auto;
     padding: 0;
 }
@@ -579,8 +580,9 @@
     padding-inline-end: 6px;
 }
 
-/* title left, switcher flush right and on the title's first line */
-.pf-v5-c-login__main-header:has(.bw-lang) {
+/* title left, switcher flush right and on the title's first line
+   (26.7 ships "div.pf-v5-c-login__main-header:has(...) { 70% 30% }", so this must be more specific) */
+.pf-v5-c-login__main div.pf-v5-c-login__main-header:has(.bw-lang) {
     grid-template-columns: minmax(0, 1fr) auto;
     column-gap: 16px;
     align-items: start;
