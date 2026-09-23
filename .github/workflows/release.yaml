@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+    # only changes that end up in the image; docs and workflow edits must not rebuild a released tag
+    paths:
+      - Dockerfile
+      - build-keycloak-root
+      - 'themes/**'
 
 permissions:
   contents: read
@@ -28,6 +33,13 @@ jobs:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Refuse to overwrite a released image
+      run: |
+        IMAGE=ghcr.io/${{ github.repository }}:${{ steps.image-version.outputs.version }}
+        if docker manifest inspect "$IMAGE" > /dev/null 2>&1; then
+          echo "::error::$IMAGE already exists. Bump KEYCLOAK_DOCKER_REVISION in the Dockerfile."
+          exit 1
+        fi
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
