@@ -1,9 +1,9 @@
 # Demo prototype behind Keycloak (`*.demo.bindworks.eu`, shared gate)
 
 For our prototypes: static sites someone put together in HTML, CSS and JS, hosted in Coolify on
-`<name>.demo.bindworks.eu` and visible only to the people we pick in Keycloak. One gate serves every
-prototype; once it is set up, a new prototype is its own Git repository, a role and a few fields in the Coolify
-dashboard, with nothing to write.
+`<name>.demo.bindworks.eu` and visible only to the people on that project. One gate serves every
+prototype; once it is set up, a new prototype is its own Git repository and a few fields in the Coolify
+dashboard, plus one role the first time a project gets a prototype.
 
 For an application that runs on its own (a backend, its own login, API callers, its own domain) use
 [STANDALONE-APP.md](STANDALONE-APP.md) instead: it gets its own oauth2-proxy, shares no cookie, and needs
@@ -15,35 +15,56 @@ One oauth2-proxy, deployed once, decides for every prototype. It never serves pa
 (Traefik) asks it about every request before passing the request on to the prototype.
 
 ```
-browser ── https://onboarding.demo.bindworks.eu/app.js ──> Traefik (Coolify proxy)
-                                                             │ middleware demo-onboarding asks:
-                                                             │ GET http://oauth2-proxy-…:4180/?allowed_groups=role:demo-annapurna:onboarding,role:demo-annapurna:all
-                                                             ▼
-                                                          oauth2-proxy (the gate)
-     no cookie ........................................ 302 → sign in at id.bindworks.eu, then back to the prototype
-     cookie, role demo-annapurna:onboarding or :all ... 202 → Traefik serves the file (nginx in the prototype's container)
-     cookie, neither role ............................. 403
+browser ── https://zuni.demo.bindworks.eu/app.js ──> Traefik (Coolify proxy)
+                                                       │ middleware demo-zuni asks:
+                                                       │ GET http://oauth2-proxy-…:4180/?allowed_groups=role:demo-annapurna:zuni-prototype,role:demo-annapurna:all
+                                                       ▼
+                                                    oauth2-proxy (the gate)
+     no cookie ............................................ 302 → sign in at id.bindworks.eu, then back to the prototype
+     cookie, role demo-annapurna:zuni-prototype or :all ... 202 → Traefik serves the file (nginx in the prototype's container)
+     cookie, neither role ................................. 403
 ```
 
 - **Signing in** happens once for all prototypes: the callback is `https://auth.demo.bindworks.eu/oauth2/callback`
   and the cookie is set for `.demo.bindworks.eu`. The role is still checked for each prototype separately,
   because each prototype's middleware asks with its own `allowed_groups`.
 - **Who may see what** is the Keycloak client `demo-annapurna`, named after Annapurna, our self-hosted Coolify
-  instance: one client role per prototype (`onboarding`), plus `all` for people who see every prototype.
-  Assigned like any other role, best through groups.
+  instance. It has one client role per project, `<project>-prototype`, which every prototype of that project
+  checks, plus `all` for people who see every prototype. The roles go to the project's existing group,
+  never to a person: see [Who sees a prototype](#who-sees-a-prototype).
 - **Bindworks staff only.** The realm already refuses everyone without `bindworks-user` on a client that lacks
   the `non-bindworks-users-allowed-application-*` scope ([REALM-BINDWORKS.md](REALM-BINDWORKS.md)); never add
   it to `demo-annapurna`.
 - **Revocation within about a minute.** oauth2-proxy refreshes the tokens at Keycloak every minute
   (`--cookie-refresh=1m`) and rebuilds the roles from the new ones (oauth2-proxy v7.15.4, `redeemRefreshToken`
-  and `extractRoles`). A removed role gives 403 on the next request; a disabled user is sent to sign in and
-  Keycloak refuses them. A newly granted role starts working the same way, within a minute.
+  and `extractRoles`). Someone removed from the group gets 403 on the next request; a disabled user is sent
+  to sign in and Keycloak refuses them. Someone newly added starts getting in the same way, within a minute.
 - **Fails closed.** If Traefik cannot reach the gate, or a label names a middleware that does not exist, the
   prototype returns an error, never the page.
 - **Only prototypes that carry the label are gated.** Anything else on `*.demo.bindworks.eu` stays as public
   as it is today.
 
-The example prototype below is `onboarding`; replace it everywhere.
+## Who sees a prototype
+
+Through the groups we already have: **`/Project Developers/<project>-devs`**. The project's role
+`<project>-prototype` is mapped onto that group once, and from then on whoever is in the group sees every
+prototype of the project. Nobody gets a prototype role directly: a direct grant is invisible in the group
+list and stays behind when the person leaves the project.
+
+| Prototype | Middleware (file) | Role it checks | Role mapped onto |
+|---|---|---|---|
+| `zuni.demo.bindworks.eu` | `demo-zuni` (`demo-zuni.yaml`) | `zuni-prototype` | `/Project Developers/zuni-devs` |
+| `zuni-checkout.demo.bindworks.eu`, Zuni's second prototype | `demo-zuni-checkout` (`demo-zuni-checkout.yaml`) | `zuni-prototype` again | nothing new in Keycloak |
+| `<project>.demo.bindworks.eu` | `demo-<project>` | `<project>-prototype` | `/Project Developers/<project>-devs` |
+| every prototype | (each middleware lists it) | `all` | one group, never people, e.g. `/Project Developers/admin-devs` |
+
+So giving someone access to Zuni's prototypes means adding them to `zuni-devs`, and taking it away means
+removing them. Keep in mind that the group grants everything else it already grants, e.g. dumplog-web's
+`zuni-expander` (the project's mobile logs). Someone who should see a prototype but nothing else of the
+project does not belong in `-devs`; give them a separate group with only the prototype role, and not a
+subgroup of `-devs`, because subgroups inherit their parent's roles.
+
+The example below is Zuni's first prototype, `zuni.demo.bindworks.eu`.
 
 ## One-time setup
 
@@ -52,7 +73,7 @@ The example prototype below is `onboarding`; replace it everywhere.
 *Clients → Create client*
 
 1. General settings: Client type `OpenID Connect`, Client ID `demo-annapurna`, Name `Demo prototypes (Annapurna)`,
-   Description `Prototypes on *.demo.bindworks.eu. One role per prototype; all = every prototype.` → Next
+   Description `Prototypes on *.demo.bindworks.eu. One role per project (<project>-prototype), mapped onto /Project Developers/<project>-devs; all = every prototype.` → Next
 2. Capability config: Client authentication **On**, Authorization Off, only **Standard flow** ticked,
    PKCE Method **`S256`** → Next
 3. Login settings: Root URL and Home URL `https://auth.demo.bindworks.eu`, Valid redirect URIs
@@ -65,7 +86,8 @@ Then:
 - *Client scopes → `demo-annapurna-dedicated` → Configure a new mapper → Audience*: Name `audience`, Included Client
   Audience `demo-annapurna`, Add to ID token and Add to access token **On** → Save (oauth2-proxy's Keycloak guide
   asks for it).
-- *Roles → Create role*: `all`, Description `Sees every demo prototype`.
+- *Roles → Create role*: `all`, Description `Sees every demo prototype`. Map it onto a group (see the table
+  above), not onto people.
 - *Credentials*: copy the Client secret into the password manager.
 
 ### DNS
@@ -131,41 +153,42 @@ services:
 
 About five minutes, all in dashboards.
 
-1. **Keycloak**: *Clients → demo-annapurna → Roles → Create role* `onboarding`, Description saying what it is and who
-   asked for it.
+1. **Keycloak — only for the project's first prototype.** Create the project's role:
+   *Clients → demo-annapurna → Roles → Create role* `zuni-prototype`, Description `Zuni prototypes on
+   *.demo.bindworks.eu`. Map it onto the project's group: *Groups → Project Developers → zuni-devs → Role
+   mapping → Assign role → Filter by clients* → tick `demo-annapurna` `zuni-prototype` → Assign.
+   A later prototype of the same project skips this step.
 2. **Coolify, the middleware**: *Servers → (server) → Proxy → Dynamic Configurations → Add*, file name
-   `demo-onboarding.yaml`:
+   `demo-zuni.yaml`:
    ```yaml
    http:
      middlewares:
-       demo-onboarding:
+       demo-zuni:
          forwardAuth:
-           address: "http://oauth2-proxy-i7dxux7qjhdgu7iod9xve8bi:4180/?allowed_groups=role:demo-annapurna:onboarding,role:demo-annapurna:all"
+           address: "http://oauth2-proxy-i7dxux7qjhdgu7iod9xve8bi:4180/?allowed_groups=role:demo-annapurna:zuni-prototype,role:demo-annapurna:all"
    ```
    Traefik picks it up without a restart. `role:<client>:<role>` is how oauth2-proxy names a Keycloak
    client role; list every role that may see the prototype, comma-separated.
 3. **Coolify, the site**: each prototype is its own Coolify application from its own Git repository.
    New resource → the prototype's repository → Build pack **Static**, Base Directory `/` (or the folder
    holding `index.html`, if it is not at the root).
-   Domain `https://onboarding.demo.bindworks.eu` (it must be `https://`).
+   Domain `https://zuni.demo.bindworks.eu` (it must be `https://`).
    The Static build pack serves the committed files with nginx and runs no build. A prototype with a build
    step (Vite, `npm run build`) uses Nixpacks or Railpack instead, Site type Static, Publish Directory `dist`.
 4. **Coolify, the label — before the first Deploy**, otherwise the prototype is public until the next one:
    *General → Container labels → Label management: Managed manually*, then find the line
    `traefik.http.routers.https-0-<uuid>.middlewares=gzip` and append the middleware:
    ```
-   traefik.http.routers.https-0-<uuid>.middlewares=gzip,demo-onboarding@file
+   traefik.http.routers.https-0-<uuid>.middlewares=gzip,demo-zuni@file
    ```
    `<uuid>` is **this prototype's** application ID, different for every prototype (the last part of its URL
    in the dashboard, `…/application/<uuid>`), not the gate's. Coolify has already written it into the line;
-   edit that line rather than typing a new one, and only append `,demo-onboarding@file`.
-   (If there is no such line, add it with `demo-onboarding@file` alone.) Save, Deploy.
-5. **Grant it**: assign `demo-annapurna` `onboarding` to the people or group who should see it (*Groups → (group) →
-   Role mapping → Assign role → Filter by clients*). Everyone with `demo-annapurna` `all` sees it already.
-6. **Check**, below, then send the link.
+   edit that line rather than typing a new one, and only append `,demo-zuni@file`.
+   (If there is no such line, add it with `demo-zuni@file` alone.) Save, Deploy.
+5. **Check**, below, then send the link to the project.
 
-**A prototype that is already deployed** gets steps 1, 2, 4 (with *Redeploy* instead of the first Deploy)
-and 5. Until the redeploy it stays public, as before.
+**A prototype that is already deployed** gets steps 1 (if its project has no role yet), 2 and 4 (with
+*Redeploy* instead of the first Deploy). Until the redeploy it stays public, as before.
 
 With labels *managed manually* Coolify no longer rewrites them. Changing the domain later: switch back to
 *Managed by Coolify*, change it, switch to manual again and re-append the middleware.
@@ -174,19 +197,18 @@ With labels *managed manually* Coolify no longer rewrites them. Changing the dom
 
 1. Nobody signed in:
    ```bash
-   curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://onboarding.demo.bindworks.eu/
+   curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://zuni.demo.bindworks.eu/
    ```
    Expect `302 https://id.bindworks.eu/realms/bindworks/protocol/openid-connect/auth?...`.
    A `200` means the label is missing: the prototype is public.
-2. Someone **with** `onboarding` or `all` signs in and sees it.
-3. Someone **without** them gets `403 Forbidden`. If they get in, the middleware's `?allowed_groups=` is
-   missing or not reaching the gate, and the prototype is open to every Bindworks account.
+2. A member of `zuni-devs` signs in and sees it.
+3. Someone outside `zuni-devs` (and without `all`) gets `403 Forbidden`. If they get in, the middleware's
+   `?allowed_groups=` is missing or not reaching the gate, and the prototype is open to every Bindworks account.
 
 ## Removing a prototype
 
-Delete the Coolify application, the dynamic configuration file `demo-onboarding.yaml` and the Keycloak role
-`onboarding` (which also removes it from every group and person). Taking access away from one person is
-just removing the role or the group membership.
+Delete the Coolify application and the dynamic configuration file `demo-zuni.yaml`. Delete the role
+`zuni-prototype` only together with the project's last prototype; that also removes it from `zuni-devs`.
 
 ## Keep in mind
 
@@ -215,5 +237,5 @@ The gate logs every decision: Coolify → `demo-oauth-keycloak-gate` → *Logs*.
 | `500` / bad gateway on every page | Traefik cannot reach the gate: wrong hostname in the address, or *Network attachment* is *Use the stack network only* |
 | After signing in people land on `auth.demo.bindworks.eu` | the prototype's domain is not under `.demo.bindworks.eu`, or the address points at the gate's public URL |
 | Keycloak: *Invalid parameter: redirect_uri* | *Valid redirect URIs* differ from `--redirect-url` |
-| `403` for someone who has the role | role created on another client, or its name differs from the address (`role:demo-annapurna:onboarding`); a newly granted role needs up to a minute |
+| `403` for a member of `zuni-devs` | the role is not mapped onto the group, was created on another client, or its name differs from the address (`role:demo-annapurna:zuni-prototype`); someone just added needs up to a minute |
 | Deep links of a single-page app give `404` | nginx has no SPA fallback: *General → generate the nginx configuration*, add it, redeploy |
