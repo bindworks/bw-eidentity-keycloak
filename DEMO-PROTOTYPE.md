@@ -156,7 +156,10 @@ About five minutes, all in dashboards.
    ```
    traefik.http.routers.https-0-<uuid>.middlewares=gzip,demo-onboarding@file
    ```
-   (If the line is not there, add it with `demo-onboarding@file` alone.) Save, Deploy.
+   `<uuid>` is **this prototype's** application ID, different for every prototype (the last part of its URL
+   in the dashboard, `…/application/<uuid>`), not the gate's. Coolify has already written it into the line;
+   edit that line rather than typing a new one, and only append `,demo-onboarding@file`.
+   (If there is no such line, add it with `demo-onboarding@file` alone.) Save, Deploy.
 5. **Grant it**: assign `demo-annapurna` `onboarding` to the people or group who should see it (*Groups → (group) →
    Role mapping → Assign role → Filter by clients*). Everyone with `demo-annapurna` `all` sees it already.
 6. **Check**, below, then send the link.
