@@ -76,6 +76,11 @@ Access inside the applications is managed with groups; the groups grant client r
 | `/Project Developers/*-devs` (and `admin-devs`) | `dumplog-web` roles `*-expander` | dumplog-web (which projects a developer can see) |
 | `/Kimai/Kimai_SuperAdmins`, `_Admins`, `_Teamleads` | `kimai` roles `Kimai-Role-*` | Kimai (SAML role list) |
 | `/oo/*/admins` | – (membership only) | presumably OpenObserve organisations, read from the `groups` claim |
+| `/Apps/*` (or any group) | `<app>` role `access` | standalone Coolify apps behind their own oauth2-proxy, see [STANDALONE-APP.md](STANDALONE-APP.md) |
+| any group | `demo-annapurna` roles `<prototype>`, `all` | static prototypes on `*.demo.bindworks.eu`, see [DEMO-PROTOTYPE.md](DEMO-PROTOTYPE.md) |
+
+Adding an application and deciding in Keycloak who may open it: [STANDALONE-APP.md](STANDALONE-APP.md) for a
+standalone app, [DEMO-PROTOTYPE.md](DEMO-PROTOTYPE.md) for a prototype on `*.demo.bindworks.eu`.
 
 The client scope `groups` (group membership claim) is assigned to `openobserve.bind.works` and `tudoo`;
 Kimai (SAML) gets `AuthnContextClassRef` and its own role and user-property mappers.
