@@ -374,10 +374,17 @@
 }
 
 .pf-v5-c-login__main .pf-v5-c-button.pf-m-secondary,
+.pf-v5-c-login__main .pf-v5-c-button.pf-m-tertiary,
 .pf-v5-c-login__main .pf-v5-c-button.pf-m-link,
 .pf-v5-c-login__main input[type=submit][name=resend].pf-v5-c-button.pf-m-primary,
 .pf-v5-c-login__main input[type=submit][name=cancel].pf-v5-c-button.pf-m-primary {
     --pf-v5-c-button--BorderRadius: 100px;
+    --pf-v5-c-button--m-tertiary--BackgroundColor: transparent;
+    --pf-v5-c-button--m-tertiary--Color: #fff;
+    --pf-v5-c-button--m-tertiary--after--BorderColor: rgba(255, 255, 255, 0.6);
+    --pf-v5-c-button--m-tertiary--hover--BackgroundColor: rgba(255, 255, 255, 0.1);
+    --pf-v5-c-button--m-tertiary--hover--Color: #fff;
+    --pf-v5-c-button--m-tertiary--hover--after--BorderColor: #fff;
     --pf-v5-c-button--m-secondary--BackgroundColor: transparent;
     --pf-v5-c-button--m-secondary--Color: #fff;
     --pf-v5-c-button--m-secondary--after--BorderColor: rgba(255, 255, 255, 0.6);
@@ -400,6 +407,7 @@
 }
 
 .pf-v5-c-login__main .pf-v5-c-button.pf-m-secondary:hover,
+.pf-v5-c-login__main .pf-v5-c-button.pf-m-tertiary:hover,
 .pf-v5-c-login__main input[type=submit][name=resend].pf-v5-c-button.pf-m-primary:hover,
 .pf-v5-c-login__main input[type=submit][name=cancel].pf-v5-c-button.pf-m-primary:hover {
     background-color: rgba(255, 255, 255, 0.1);
@@ -463,15 +471,40 @@
     border-color: rgba(255, 255, 255, 0.25);
 }
 
-#kc-social-providers .pf-v5-c-button.pf-m-secondary {
+/* 26.8: the label above the buttons is a lined divider (divider.ftl) instead of a footer band */
+.kc-login-divider {
+    margin: 28px 0 20px;
+    gap: 12px;
+}
+
+.kc-login-divider span {
+    color: rgba(255, 255, 255, 0.8);
+    font-family: var(--bw-font);
+    font-size: 14px;
+}
+
+.kc-login-divider::before,
+.kc-login-divider::after {
+    border-bottom-color: rgba(255, 255, 255, 0.25);
+}
+
+#kc-social-providers .pf-v5-c-button {
     --pf-v5-c-button--m-secondary--BackgroundColor: #fff;
     --pf-v5-c-button--m-secondary--Color: var(--bw-ink);
     --pf-v5-c-button--m-secondary--hover--BackgroundColor: #eef2ff;
     --pf-v5-c-button--m-secondary--hover--Color: var(--bw-ink);
     --pf-v5-c-button--m-secondary--after--BorderColor: transparent;
+    /* 26.8 renders the social buttons as pf-m-tertiary */
+    --pf-v5-c-button--m-tertiary--BackgroundColor: #fff;
+    --pf-v5-c-button--m-tertiary--Color: var(--bw-ink);
+    --pf-v5-c-button--m-tertiary--hover--BackgroundColor: #eef2ff;
+    --pf-v5-c-button--m-tertiary--hover--Color: var(--bw-ink);
+    --pf-v5-c-button--m-tertiary--after--BorderColor: transparent;
+    --pf-v5-c-button--m-tertiary--hover--after--BorderColor: transparent;
     background-color: #fff;
     color: var(--bw-ink);
     border: 0;
+    border-radius: 100px;
     justify-content: center !important;
     gap: 10px;
     min-height: 52px;
@@ -479,26 +512,28 @@
 }
 
 /* text centred on the whole button like SIGN IN; the logo sits on the left edge */
-#kc-social-providers .pf-v5-c-button.pf-m-secondary {
+#kc-social-providers .pf-v5-c-button {
     position: relative;
 }
 
-#kc-social-providers .pf-v5-c-button.pf-m-secondary > svg {
+#kc-social-providers .pf-v5-c-button > svg,
+#kc-social-providers .pf-v5-c-button > img,
+#kc-social-providers .pf-v5-c-button > picture {
     position: absolute;
     left: 28px;
     top: 50%;
     transform: translateY(-50%);
 }
 
-/* the base theme recolours every logo except Google's to PatternFly cyan */
-#kc-social-providers .pf-v5-c-button.pf-m-secondary > svg:not(.google) {
+/* on 26.7 the base theme recolours every logo except Google's to PatternFly cyan */
+#kc-social-providers .pf-v5-c-button > svg:not(.google) {
     filter: none;
 }
 
 /* same font as the primary button, black text, not uppercased */
-#kc-social-providers .pf-v5-c-button.pf-m-secondary,
-#kc-social-providers .pf-v5-c-button.pf-m-secondary .kc-social-provider-name,
-#kc-social-providers .pf-v5-c-button.pf-m-secondary span {
+#kc-social-providers .pf-v5-c-button,
+#kc-social-providers .pf-v5-c-button .kc-social-provider-name,
+#kc-social-providers .pf-v5-c-button span {
     color: var(--bw-ink);
     margin: 0;
     font-family: var(--bw-font);
@@ -512,7 +547,7 @@
    classes "bw-idp bw-idp-<name>" (which the base template puts on the label span instead of
    drawing an <svg>), and the logo goes in the same place as a built-in one. To add a provider:
    drop img/idp/<name>.svg in and add kcLogoIdP-<alias> plus one rule here. */
-#kc-social-providers .pf-v5-c-button.pf-m-secondary > span.bw-idp::before {
+#kc-social-providers .pf-v5-c-button > span.bw-idp::before {
     content: "";
     position: absolute;
     left: 28px;
@@ -523,8 +558,35 @@
     background: center / contain no-repeat;
 }
 
-#kc-social-providers .pf-v5-c-button.pf-m-secondary > span.bw-idp-apple::before {
+#kc-social-providers .pf-v5-c-button > span.bw-idp-apple::before {
     background-image: url('../img/idp/apple.svg');
+}
+
+/* 4+ providers: Keycloak lays the buttons out in a two-column grid, where there is no room for a
+   logo pinned to the left edge - let it flow next to the label instead. */
+#kc-social-providers .pf-v5-l-grid .pf-v5-c-button {
+    padding: 14px 16px;
+    gap: 8px;
+}
+
+#kc-social-providers .pf-v5-l-grid .pf-v5-c-button > svg,
+#kc-social-providers .pf-v5-l-grid .pf-v5-c-button > img,
+#kc-social-providers .pf-v5-l-grid .pf-v5-c-button > picture,
+#kc-social-providers .pf-v5-l-grid .pf-v5-c-button > span.bw-idp::before {
+    position: static;
+    transform: none;
+    flex: none;
+}
+
+#kc-social-providers .pf-v5-l-grid .pf-v5-c-button > span.bw-idp {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#kc-social-providers .pf-v5-l-grid .pf-v5-c-button > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* An identity provider whose provider supplies Font Awesome icon classes (e.g. "fa fa-apple")

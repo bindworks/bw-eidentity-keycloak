@@ -11,7 +11,7 @@ COPY build-keycloak-root /tmp/source/
 RUN cd /tmp/source && ./build-keycloak-root
 
 
-FROM quay.io/keycloak/keycloak:26.7.4 AS builder
+FROM quay.io/keycloak/keycloak:26.8.2 AS builder
 
 ENV KC_DB=postgres \
     KC_CACHE=ispn \
@@ -26,9 +26,9 @@ COPY themes/ /opt/keycloak/themes/
 RUN /opt/keycloak/bin/kc.sh build
 
 
-FROM quay.io/keycloak/keycloak:26.7.4
+FROM quay.io/keycloak/keycloak:26.8.2
 
-ENV KEYCLOAK_DOCKER_REVISION=26.7.4-3
+ENV KEYCLOAK_DOCKER_REVISION=26.8.2-1
 
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 
