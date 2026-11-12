@@ -98,3 +98,29 @@ Kimai (SAML) gets `AuthnContextClassRef` and its own role and user-property mapp
 | User registration / Forgot password / Remember me | off / off / off |
 
 Sessions, tokens, events (off), required actions and the user profile are Keycloak defaults.
+
+## The login theme is shared with other realms
+
+`themes/bindworks` is not specific to this realm — other realms use it as their login theme
+(e.g. `zscanner` / ZUNI Cloud). It intentionally keeps the Bindworks branding for all of them:
+the wordmark in the top bar (`resources/img/bindworks-logo.svg`) and the **Kontakt** button that
+`resources/js/header.js` adds, which links to `serviceadmin@bindworks.eu`. A realm that needs its
+own logo or contact would need a child theme (`parent=bindworks`), not a change in this one.
+
+Two things to know before pointing a realm with more identity providers at it:
+
+* **Provider logos.** Keycloak's base template draws a built-in SVG logo for a provider only when
+  its icon classes are empty; otherwise it renders `<span class="<icon classes>">` and expects a
+  Font Awesome glyph, which PatternFly 5 cannot supply for brand icons (it ships only the *solid*
+  font) — the button then shows a missing-glyph box. The Apple provider jar returns `fa fa-apple`,
+  so the theme overrides it with `kcLogoIdP-apple=bw-idp bw-idp-apple` in `theme.properties` and
+  draws `resources/img/idp/apple.svg` from `bindworks.css`. A further provider needs the same three
+  pieces: the SVG in `resources/img/idp/`, the `kcLogoIdP-<alias>` line, and one `bw-idp-<name>`
+  rule; leaving the value blank instead gives Keycloak's own logo for the providers it knows. The
+  icon classes are looked up as `kcLogoIdP-<alias>`, then `kcLogoIdP-<provider id>`, then the
+  provider's own value. As a last resort `bindworks.css` suppresses any leftover `fa-*` glyph,
+  leaving a text-only button.
+* **At most three providers.** Above three, Keycloak switches the button list to a two-column
+  PatternFly grid (`pf-v5-l-grid pf-m-all-6-col-on-sm`). The theme does not style that grid: the
+  buttons get too narrow and the logo, which is pinned 28 px from the left edge, overlaps the
+  label. A realm with four or more providers needs grid styling added first.

@@ -437,12 +437,12 @@
     padding-top: 0;
 }
 
-/* social providers (Google) */
+/* social providers */
 #kc-social-providers {
     margin-top: 0;
 }
 
-/* "Or sign in with" between the form and the Google button */
+/* "Or sign in with" between the form and the social buttons */
 .pf-v5-c-login__main-footer-band:has(+ #kc-social-providers) .pf-v5-c-login__main-footer-band-item,
 .pf-v5-c-login__main-footer-band-item.pf-v5-u-font-size-sm {
     display: block;
@@ -490,8 +490,9 @@
     transform: translateY(-50%);
 }
 
-#kc-social-providers .pf-v5-c-button.pf-m-secondary > span {
-    margin: 0 auto;
+/* the base theme recolours every logo except Google's to PatternFly cyan */
+#kc-social-providers .pf-v5-c-button.pf-m-secondary > svg:not(.google) {
+    filter: none;
 }
 
 /* same font as the primary button, black text, not uppercased */
@@ -505,6 +506,34 @@
     font-size: 15px;
     letter-spacing: normal;
     text-transform: none;
+}
+
+/* Logos for providers Keycloak has no built-in one for: theme.properties gives the provider the
+   classes "bw-idp bw-idp-<name>" (which the base template puts on the label span instead of
+   drawing an <svg>), and the logo goes in the same place as a built-in one. To add a provider:
+   drop img/idp/<name>.svg in and add kcLogoIdP-<alias> plus one rule here. */
+#kc-social-providers .pf-v5-c-button.pf-m-secondary > span.bw-idp::before {
+    content: "";
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background: center / contain no-repeat;
+}
+
+#kc-social-providers .pf-v5-c-button.pf-m-secondary > span.bw-idp-apple::before {
+    background-image: url('../img/idp/apple.svg');
+}
+
+/* An identity provider whose provider supplies Font Awesome icon classes (e.g. "fa fa-apple")
+   gets a <span class="fa fa-..."> instead of a logo, and PatternFly 5 bundles no brands font -
+   the glyph would render as a missing-glyph box. Give it a bw-idp logo above, or blank its
+   kcLogoIdP-<alias> for Keycloak's own; this keeps anything unlisted a clean text-only button. */
+#kc-social-providers [class*="fa-"]::before,
+#kc-social-providers [class*="fa-"]::after {
+    content: none;
 }
 
 /* alerts (errors, info) inside the blue card */

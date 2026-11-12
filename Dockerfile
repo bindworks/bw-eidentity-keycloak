@@ -28,7 +28,7 @@ RUN /opt/keycloak/bin/kc.sh build
 
 FROM quay.io/keycloak/keycloak:26.7.4
 
-ENV KEYCLOAK_DOCKER_REVISION=26.7.4-2
+ENV KEYCLOAK_DOCKER_REVISION=26.7.4-3
 
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 
