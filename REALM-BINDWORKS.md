@@ -107,7 +107,7 @@ the wordmark in the top bar (`resources/img/bindworks-logo.svg`) and the **Konta
 `resources/js/header.js` adds, which links to `serviceadmin@bindworks.eu`. A realm that needs its
 own logo or contact would need a child theme (`parent=bindworks`), not a change in this one.
 
-Two things to know before pointing a realm with more identity providers at it:
+Three things to know before pointing a realm with more identity providers at it:
 
 * **Provider logos.** Keycloak's base template draws a built-in SVG logo for a provider only when
   its icon classes are empty; otherwise it renders `<span class="<icon classes>">` and expects a
@@ -120,7 +120,17 @@ Two things to know before pointing a realm with more identity providers at it:
   icon classes are looked up as `kcLogoIdP-<alias>`, then `kcLogoIdP-<provider id>`, then the
   provider's own value. As a last resort `bindworks.css` suppresses any leftover `fa-*` glyph,
   leaving a text-only button.
-* **At most three providers.** Above three, Keycloak switches the button list to a two-column
-  PatternFly grid (`pf-v5-l-grid pf-m-all-6-col-on-sm`). The theme does not style that grid: the
-  buttons get too narrow and the logo, which is pinned 28 px from the left edge, overlaps the
-  label. A realm with four or more providers needs grid styling added first.
+* **Four or more providers switch to a grid.** Keycloak then renders the button list as a
+  two-column PatternFly grid (`pf-v5-l-grid pf-m-all-6-col-on-sm`) instead of full-width pills.
+  `bindworks.css` styles that case separately: inside `.pf-v5-l-grid` the logo stops being pinned
+  28 px from the left edge and flows inline next to the label (which ellipsises), because the
+  narrow buttons would otherwise have logo and text overlap.
+* **Button labels and modifier classes are the base theme's, and they move between releases.**
+  26.8 renamed the social button modifier from `pf-m-secondary` to `pf-m-tertiary`, stopped
+  inlining the logos as `<svg>` in favour of `<img>`/`<picture>`, replaced the "Or sign in with"
+  footer band with a `.kc-login-divider`, and started wrapping every label in
+  `msg("signInWithProvider", displayName)`. The theme therefore matches social buttons without
+  naming the modifier, positions `> svg, > img, > picture` alike, and overrides
+  `signInWithProvider={0}` in `messages/messages_{en,cs}.properties` — otherwise the Apple
+  provider, whose display name is "Sign in with Apple", would read "Sign in with Sign in with
+  Apple". Re-check these four points on the next major upgrade.
