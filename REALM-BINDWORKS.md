@@ -64,6 +64,17 @@ non-Bindworks Application Role Check (see above)
 - The flow's conditions ("sub-flow executed") reference the sub-flows **by name** (`via Password`,
   `via Email OTP`). Renaming a sub-flow breaks the flow; an unconfigured condition lets people in without
   a second step. Test with a user of each kind after any change.
+- **`email-code-theme` requires email authenticator ≥ 1.1.1** (image ≥ 26.8.2-2). Up to 1.1.0 the plugin
+  shipped that theme's `theme.properties` at `theme/email-code-theme/theme.properties`, one directory above
+  where Keycloak reads it — it reads one per theme **type**, at `theme/<name>/<type>/theme.properties`, as
+  every built-in theme does. So `parent=keycloak` never applied and the theme had **no parent**: the OTP code
+  mail worked, because that template is the theme's own, and every mail inherited from `base` failed with
+  `TemplateNotFoundException` — password reset, e-mail verification, execute-actions, identity-provider link,
+  org invites, the `event-*` notices. That includes `email-test`, so the admin console's SMTP **Test
+  connection** button was a *false negative* in this realm: it died on the template before opening a socket
+  and said nothing about the relay. `zscanner` had the same setting and the same breakage. Never a Keycloak
+  regression — identical on 26.7.4 with a byte-identical jar, and broken since the plugin was introduced.
+  If a future image ever pins an older plugin, this realm's mail silently narrows to the OTP code again.
 
 ## Application-specific roles (groups)
 
@@ -90,12 +101,18 @@ Kimai (SAML) gets `AuthnContextClassRef` and its own role and user-property mapp
 | Setting | Value |
 |---|---|
 | Display name | `Bindworks` (used in the e-mail subject and the browser title) |
-| Login theme / Email theme | `bindworks` (this repo, `themes/bindworks`) / `email-code-theme` (from the email OTP plugin) |
+| Login theme / Email theme | `bindworks` (this repo, `themes/bindworks`) / `email-code-theme` (from the email OTP plugin, **needs plugin ≥ 1.1.1** — see the authentication-flow notes above) |
 | Localization | on, `cs` (default) and `en` |
 | Realm overrides (cs + en) | `loginAccountTitle` (Přihlášení do / Sign in to Bindworks), `emailCodeSubject`, `emailCodeBody` |
-| SMTP | `relay-mail.smtprelay.svc.cluster.local:587`, from `serviceadmin@bindworks.eu` |
+| SMTP | `smtprelay:587` (no auth, no TLS), from `serviceadmin@bindworks.eu` |
 | Brute force detection | on, lockout after 10 failures, temporary (1 min, growing to 15 min) |
 | User registration / Forgot password / Remember me | off / off / off |
+
+The SMTP host changed on 2026-11-17: it was `relay-mail.smtprelay.svc.cluster.local:587` while Keycloak ran
+on AKS, and that name does not resolve from the Contabo host it runs on now, so mail failed on DNS until the
+realm was repointed. `smtprelay` is reachable only because the `022-keycloak` stack joined the `mail` docker
+network — see `stacks/022-keycloak/compose.yaml` in bw-ops-prod. Changing `realm_smtp_config` in the database
+is not enough on its own; the running server serves the cached value until the container is recreated.
 
 Sessions, tokens, events (off), required actions and the user profile are Keycloak defaults.
 
