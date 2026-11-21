@@ -64,7 +64,8 @@ non-Bindworks Application Role Check (see above)
 - The flow's conditions ("sub-flow executed") reference the sub-flows **by name** (`via Password`,
   `via Email OTP`). Renaming a sub-flow breaks the flow; an unconfigured condition lets people in without
   a second step. Test with a user of each kind after any change.
-- **`email-code-theme` requires email authenticator ≥ 1.1.1** (image ≥ 26.8.2-2). Up to 1.1.0 the plugin
+- **`email-code-theme` requires email authenticator ≥ 1.1.1** (first shipped in image `26.8.2-2`; carried
+  unchanged since — every rebuild re-verifies the jar by sha256). Up to 1.1.0 the plugin
   shipped that theme's `theme.properties` at `theme/email-code-theme/theme.properties`, one directory above
   where Keycloak reads it — it reads one per theme **type**, at `theme/<name>/<type>/theme.properties`, as
   every built-in theme does. So `parent=keycloak` never applied and the theme had **no parent**: the OTP code
@@ -115,6 +116,29 @@ network — see `stacks/022-keycloak/compose.yaml` in bw-ops-prod. Changing `rea
 is not enough on its own; the running server serves the cached value until the container is recreated.
 
 Sessions, tokens, events (off), required actions and the user profile are Keycloak defaults.
+
+## Image tags
+
+Our image is `ghcr.io/bindworks/bw-eidentity-keycloak`, tagged
+`<upstream base tag>-bw<our build number on that base>` — e.g. `26.8.2-3-bw1` is our first build on
+upstream `quay.io/keycloak/keycloak:26.8.2-3`. Before `26.8.2-3-bw1` the scheme was
+`<keycloak version>-<our build number>` (`26.8.2-2` and earlier), which could not say which upstream
+build an image was based on and collided with upstream's own `-N` suffixes.
+
+The base is always pinned to a **numbered** upstream tag, never the floating `26.8.2`/`latest` tags:
+upstream retags those in place, so a rebuild could change the JDK with nothing in the repo recording
+it. That is how a JDK affected by CVE-2026-114938 (Java4Shell) reached production in `26.8.2-2`.
+`26.8.2-3-bw1` moved the base to upstream `26.8.2-3`, which carries the fixed Red Hat OpenJDK
+21.0.13.1. Keycloak itself stayed on 26.8.2 — that was a JDK change, not an upgrade.
+
+What runs is recorded by the image digest pinned in `stacks/022-keycloak/compose.yaml` in the ops
+repo; Renovate is deliberately disabled for `ghcr.io/bindworks/**` there, so a new tag is never
+picked up on its own. After any base change, re-verify before deploying:
+
+```
+docker run --rm --entrypoint java <image> -version                       # must be >= 21.0.13.1
+docker run --rm --entrypoint sh <image> -c 'cd /opt/keycloak/providers && sha256sum *'
+```
 
 ## The login theme is shared with other realms
 
